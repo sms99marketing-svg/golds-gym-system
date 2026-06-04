@@ -1,0 +1,59 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  TRAINER
+}
+
+enum ShiftType {
+  FULL_SHIFT
+  SPLIT_SHIFT
+  CUSTOM_SHIFT
+}
+
+enum PtType {
+  REGULAR
+  ALTERNATE_MWF
+  ALTERNATE_TTS
+}
+
+model User {
+  id              String           @id @default(uuid())
+  mobileNumber    String           @unique
+  role            Role             @default(TRAINER)
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+}
+
+model TrainerProfile {
+  id              String           @id @default(uuid())
+  userId          String           @unique
+  fullName        String
+}
+
+model Shift {
+  id              String           @id @default(uuid())
+  trainerId       String
+  shiftType       ShiftType
+  date            DateTime         @db.Date
+  startTime1      DateTime         @db.Time
+  endTime1        DateTime         @db.Time
+}
+
+model PtSession {
+  id                String           @id @default(uuid())
+  trainerId         String
+  clientName        String
+  ptType            PtType
+  startTime         DateTime         @db.Time
+  endTime         DateTime         @db.Time
+  status            String           @default("OCCUPIED")
+}
