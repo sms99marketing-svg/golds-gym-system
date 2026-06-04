@@ -3,104 +3,697 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gold's Gym Management System</title>
+    <title>Gold's Gym Management & Scheduling System</title>
     <style>
+        :root {
+            --primary: #FFB400;
+            --secondary: #FFC933;
+            --dark: #111111;
+            --bg: #181818;
+            --glass: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 180, 0, 0.15);
+        }
+
         body {
             margin: 0;
             padding: 0;
-            background-color: #141414;
+            background-color: var(--dark);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        /* Authentication Layout */
+        .auth-screen {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            color: #ffffff;
+            background: radial-gradient(circle at center, #1f1f1f 0%, #111111 100%);
         }
-        .login-container {
-            background-color: #181818;
+
+        .auth-card {
+            background-color: var(--bg);
             padding: 40px;
             border-radius: 16px;
-            border: 1px solid rgba(255, 180, 0, 0.2);
-            width: 350px;
+            border: 1px solid var(--border);
+            width: 360px;
             text-align: center;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
         }
-        h2 {
-            color: #FFB400;
+
+        .auth-card h2 {
+            color: var(--primary);
             text-transform: uppercase;
-            margin-bottom: 25px;
-            letter-spacing: 1px;
+            margin: 0 0 5px 0;
+            letter-spacing: 2px;
+            font-size: 28px;
+            font-weight: 900;
         }
-        input {
+
+        .auth-subtitle {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #aaa;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        input, select, textarea {
             width: 100%;
             padding: 12px;
-            margin-bottom: 15px;
             border-radius: 8px;
-            border: 1px solid #333;
-            background-color: #222;
+            border: 1px solid #2a2a2a;
+            background-color: #1f1f1f;
             color: white;
             box-sizing: border-box;
             font-size: 14px;
+            transition: border-color 0.2s;
         }
-        input:focus {
-            border-color: #FFB400;
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
             outline: none;
         }
+
         button {
             width: 100%;
             padding: 12px;
-            background-color: #FFB400;
-            color: #141414;
+            background-color: var(--primary);
+            color: var(--dark);
             border: none;
             border-radius: 8px;
-            font-weight: bold;
+            font-weight: 900;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             text-transform: uppercase;
-            transition: background 0.2s;
+            letter-spacing: 1px;
+            transition: background 0.2s, transform 0.1s;
         }
+
         button:hover {
-            background-color: #e09e00;
+            background-color: var(--secondary);
         }
-        .dashboard-container {
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Main Workspace Layout */
+        .app-container {
             display: none;
-            width: 90%;
-            max-width: 1200px;
-            background-color: #181818;
-            padding: 30px;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 180, 0, 0.2);
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg);
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .logo-area h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .logo-area p {
+            margin: 2px 0 0 0;
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .mode-toggle {
+            background: #1f1f1f;
+            border: 1px solid #2a2a2a;
+            padding: 4px;
+            border-radius: 8px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .mode-btn {
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 6px;
+            background: transparent;
+            color: #888;
+            width: auto;
+            text-transform: uppercase;
+        }
+
+        .mode-btn.active {
+            background-color: var(--primary);
+            color: var(--dark);
+        }
+
+        .logout-btn {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 8px 16px;
+            font-size: 12px;
+            width: auto;
+        }
+
+        .logout-btn:hover {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        /* Analytics Dashboard Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background-color: var(--bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .metric-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--primary);
+            margin-top: 5px;
+        }
+
+        /* Content Workspace Split */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background-color: var(--bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 900;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #222;
+        }
+
+        /* Timetable UI Component */
+        .schedule-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .schedule-card {
+            background-color: #1f1f1f;
+            border: 1px solid #2a2a2a;
+            padding: 16px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: border-color 0.2s;
+        }
+
+        .schedule-card:hover {
+            border-color: rgba(255, 180, 0, 0.4);
+        }
+
+        .session-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .session-type {
+            font-size: 9px;
+            font-weight: 900;
+            background-color: rgba(255, 180, 0, 0.1);
+            color: var(--primary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            width: max-content;
+            text-transform: uppercase;
+        }
+
+        .session-client {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .session-trainer {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .session-time-block {
+            text-align: right;
+        }
+
+        .session-hours {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--secondary);
+            font-family: monospace;
+        }
+
+        .session-status {
+            font-size: 10px;
+            font-weight: 700;
+            color: #ef4444;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        /* Form Layout Enhancements */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 6px;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .radio-label input {
+            width: auto;
+            margin: 0;
+        }
+
+        .alert-box {
+            background-color: rgba(234, 179, 8, 0.1);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            color: #facc15;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        /* Utilities */
+        .copy-card {
+            background: #1f1f1f;
+            border: 1px solid #2a2a2a;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .copy-card span {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .copy-card p {
+            margin: 0;
+            font-size: 12px;
+            color: #ddd;
+            font-style: italic;
+            line-height: 1.4;
         }
     </style>
 </head>
 <body>
 
-    <!-- LOGIN SCREEN -->
-    <div class="login-container" id="loginBox">
-        <h2>Gold's Gym Login</h2>
-        <input type="text" id="mobileNumber" placeholder="Mobile Number">
-        <input type="password" id="otpNumber" placeholder="Enter OTP">
-        <button onclick="handleLogin()">Login</button>
+    <!-- SECTION 1: AUTHENTICATION INTERFACE -->
+    <div class="auth-screen" id="authScreen">
+        <div class="auth-card">
+            <h2>Gold's Gym</h2>
+            <div class="auth-subtitle">Management Control Node</div>
+            
+            <div class="form-group">
+                <label>Registered Mobile Number</label>
+                <input type="text" id="authMobile" placeholder="e.g. 9876543210">
+            </div>
+            <div class="form-group">
+                <label>Secure Keypad OTP Code</label>
+                <input type="password" id="authOtp" placeholder="Use master key: 123456">
+            </div>
+            <button onclick="executeAuthentication()">Request Session Verification</button>
+        </div>
     </div>
 
-    <!-- MAIN SYSTEM DASHBOARD -->
-    <div class="dashboard-container" id="dashboardBox">
-        <h2 style="text-align: left; margin-bottom: 10px;">Gold's Gym Scheduling Panel</h2>
-        <p style="color: #aaa; margin-bottom: 30px;">Welcome back. Manage gym outreach campaigns and updates.</p>
-        <hr style="border: 0; border-top: 1px solid #333; margin-bottom: 20px;">
-        <p style="color: #FFB400; font-size: 18px;">✓ System Core Connected Successfully.</p>
+    <!-- SECTION 2: LIVE CORE WORKSPACE -->
+    <div class="app-container" id="appWorkspace">
+        <header>
+            <div class="logo-area">
+                <h1>Gold's Gym Control Panel</h1>
+                <p>System Status: <span style="color: #22c55e; font-weight: bold;">● Live Operational Terminal</span></p>
+            </div>
+            <div class="header-controls">
+                <div class="mode-toggle" id="adminToggleContainer">
+                    <button class="mode-btn active" id="btnAdminMode" onclick="setRoleView('ADMIN')">Super Admin</button>
+                    <button class="mode-btn" id="btnTrainerMode" onclick="setRoleView('TRAINER')">Trainer View</button>
+                </div>
+                <button class="logout-btn" onclick="terminateSession()">Logout</button>
+            </div>
+        </header>
+
+        <!-- Metrics Layer -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Total System Assets</div>
+                <div class="metric-value" id="countTrainers">3</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Active PT Ledger Rows</div>
+                <div class="metric-value" id="countSessions">2</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Available Floor Staff</div>
+                <div class="metric-value" style="color: #22c55e;">1</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Gym Window Range</div>
+                <div class="metric-value" style="color: #a855f7;">06:00 - 23:00</div>
+            </div>
+        </div>
+
+        <!-- Functional Workspace Columns -->
+        <div class="workspace-grid">
+            
+            <!-- Left Workspace: Configuration Input and Live Calendar Stream -->
+            <div class="left-column">
+                
+                <!-- Schedule Generation Block (Hidden from Trainers) -->
+                <div class="panel" id="schedulingControlPanel">
+                    <div class="panel-title">Engine Scheduling Command</div>
+                    
+                    <div class="alert-box" id="collisionAlert"></div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Target Client Name</label>
+                            <input type="text" id="inputClient" placeholder="Enter gym member name">
+                        </div>
+                        <div class="form-group">
+                            <label>Assign Trainer Asset</label>
+                            <select id="selectTrainer">
+                                <option value="Anubhav Sharma">Anubhav Sharma</option>
+                                <option value="Rahul Mehta">Rahul Mehta</option>
+                                <option value="Vikram Singh">Vikram Singh</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Session Window Start Time</label>
+                            <input type="time" id="inputStart" value="07:00">
+                        </div>
+                        <div class="form-group">
+                            <label>Session Window End Time</label>
+                            <input type="time" id="inputEnd" value="08:00">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Recurrence Automation Profile</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="recurrence" value="REGULAR" checked> Regular Routine (Mon-Sat)
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="recurrence" value="ALTERNATE_DAY"> Alternate Day Engine (M-W-F)
+                            </label>
+                        </div>
+                    </div>
+
+                    <button onclick="commitScheduleRow()" style="margin-top: 10px;">Commit to System Ledger</button>
+                </div>
+
+                <!-- Live Structural Timetable Stream -->
+                <div class="panel">
+                    <div class="panel-title">Active Operational Timetable</div>
+                    <div class="schedule-list" id="timetableContainer">
+                        <!-- Dynamic schedule content maps here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Workspace: Operational Toolkits (WhatsApp Lead Cleaner & Marketing Vault) -->
+            <div class="right-column">
+                
+                <!-- WhatsApp Numbers Parsing Matrix -->
+                <div class="panel">
+                    <div class="panel-title">WhatsApp Lead Extractor</div>
+                    <p style="font-size: 11px; color: #aaa; margin: -10px 0 15px 0; line-height: 1.4;">
+                        Drop text lists, raw data, or clipboard logs here to automatically extract and deduplicate active phone numbers.
+                    </p>
+                    <div class="form-group">
+                        <textarea id="whatsappRawInput" rows="4" placeholder="Paste raw chat logs or number strings (+91 99999 xxxxx)..."></textarea>
+                    </div>
+                    <button onclick="executeDataExtraction()" style="background-color: #222; color: var(--primary); border: 1px solid var(--border);">Parse Data Strings</button>
+                    
+                    <div id="cleanOutputContainer" style="display: none; margin-top: 15px; pt-15px; border-top: 1px solid #222;">
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; margin-bottom: 6px;">
+                            <span style="color: #22c55e;">CLEAN MATRIX EXTRACTED</span>
+                            <span style="color: #aaa;" id="extractedTotalCount">Total Count: 0</span>
+                        </div>
+                        <div id="whatsappCleanedOutput" style="background: #111; border: 1px solid #2a2a2a; padding: 10px; border-radius: 6px; font-size: 12px; font-family: monospace; color: #22c55e; max-height: 120px; overflow-y: auto; word-break: break-all; user-select: all;"></div>
+                    </div>
+                </div>
+
+                <!-- Marketing Campaign Text Vault -->
+                <div class="panel">
+                    <div class="panel-title">Campaign Copy Vault</div>
+                    
+                    <div class="copy-card">
+                        <span>Premium Rate Daily Breakdown Layout</span>
+                        <p>"Transform today at Gold's Gym! Lock in your annual membership breakdown of just ₹84 per day.* Full access to elite trainers, luxury equipment, and custom tracking."</p>
+                    </div>
+
+                    <div class="copy-card">
+                        <span>Urgency Extension Broadcast Call</span>
+                        <p>"FINAL NOTICE: The extended access promo window closes tonight at 10:00 PM sharp. Secure your pricing tier now before rates adjust!"</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
 
+    <!-- BUSINESS ENGINE LOGIC INJECTIONS -->
     <script>
-        function handleLogin() {
-            var mobile = document.getElementById('mobileNumber').value;
-            var otp = document.getElementById('otpNumber').value;
+        // Memory Ledger Architecture
+        let activeSessions = [
+            { id: '1', clientName: 'Karan Johar', trainerName: 'Rahul Mehta', startTime: '07:00', endTime: '08:00', type: 'REGULAR' },
+            { id: '2', clientName: 'Amit Shah', trainerName: 'Anubhav Sharma', startTime: '09:00', endTime: '10:00', type: 'ALTERNATE_DAY' }
+        ];
+
+        let accountRole = "ADMIN";
+
+        // View Orchestrator Engines
+        function renderTimetable() {
+            const container = document.getElementById('timetableContainer');
+            container.innerHTML = '';
+            
+            activeSessions.forEach(session => {
+                const card = document.createElement('div');
+                card.className = 'schedule-card';
+                card.innerHTML = `
+                    <div class="session-info">
+                        <span class="session-type">${session.type}</span>
+                        <span class="session-client">${session.clientName}</span>
+                        <span class="session-trainer">Assigned Trainer: ${session.trainerName}</span>
+                    </div>
+                    <div class="session-time-block">
+                        <span class="session-hours">${session.startTime} - ${session.endTime}</span>
+                        <div class="session-status">● OCCUPIED</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            document.getElementById('countSessions').innerText = activeSessions.length;
+        }
+
+        function executeAuthentication() {
+            const mobile = document.getElementById('authMobile').value.trim();
+            const otp = document.getElementById('authOtp').value.trim();
 
             if (otp === "123456") {
-                document.getElementById('loginBox').style.display = 'none';
-                document.getElementById('dashboardBox').style.display = 'block';
+                document.getElementById('authScreen').style.display = 'none';
+                document.getElementById('appWorkspace').style.display = 'block';
+                renderTimetable();
             } else {
-                alert("Wrong OTP! Please use the master bypass code: 123456");
+                alert("Security Authorization Rejection: Invalid key entry credentials.");
+            }
+        }
+
+        function setRoleView(targetRole) {
+            accountRole = targetRole;
+            const adminBtn = document.getElementById('btnAdminMode');
+            const trainerBtn = document.getElementById('btnTrainerMode');
+            const controlPanel = document.getElementById('schedulingControlPanel');
+
+            if (targetRole === 'ADMIN') {
+                adminBtn.classList.add('active');
+                trainerBtn.classList.remove('active');
+                controlPanel.style.display = 'block';
+            } else {
+                adminBtn.classList.remove('active');
+                trainerBtn.classList.add('active');
+                controlPanel.style.display = 'none';
+            }
+        }
+
+        function terminateSession() {
+            document.getElementById('authMobile').value = '';
+            document.getElementById('authOtp').value = '';
+            document.getElementById('appWorkspace').style.display = 'none';
+            document.getElementById('authScreen').style.display = 'flex';
+        }
+
+        // Collision Verification Scheduling Algorithm
+        function commitScheduleRow() {
+            const client = document.getElementById('inputClient').value.trim();
+            const trainer = document.getElementById('selectTrainer').value;
+            const start = document.getElementById('inputStart').value;
+            const end = document.getElementById('inputEnd').value;
+            const type = document.querySelector('input[name="recurrence"]:checked').value;
+            const alertBox = document.getElementById('collisionAlert');
+
+            alertBox.style.display = 'none';
+
+            if (!client) {
+                alert("Validation Failure: Client input field cannot evaluate empty.");
+                return;
+            }
+
+            if (start >= end) {
+                alert("Validation Failure: Time Engine parameters error. End window must scale past Start window.");
+                return;
+            }
+
+            // Conflict Engine Rules Check
+            const targetClash = activeSessions.some(s => {
+                if (s.trainerName !== trainer) return false;
+                return (start >= s.startTime && start < s.endTime) || (end > s.startTime && end <= s.endTime);
+            });
+
+            if (targetClash) {
+                alertBox.innerText = `CONFLICT REJECTION: Trainer ${trainer} has already been logged into an active PT session block inside this hour sequence.`;
+                alertBox.style.display = 'block';
+                return;
+            }
+
+            activeSessions.push({
+                id: Date.now().toString(),
+                clientName: client,
+                trainerName: trainer,
+                startTime: start,
+                endTime: end,
+                type: type
+            });
+
+            document.getElementById('inputClient').value = '';
+            renderTimetable();
+        }
+
+        // WhatsApp Custom Cleaning Algorithm
+        function executeDataExtraction() {
+            const rawData = document.getElementById('whatsappRawInput').value;
+            
+            // Regular expression matching standard Indian country mobile codes and number arrays
+            const formatMatches = rawData.match(/(?:\+91|91\s?)?[6-9]\d{9}/g) || [];
+            
+            const strippedArr = formatMatches.map(num => {
+                let textStr = num.replace(/\s+/g, '');
+                if (textStr.startsWith('+91')) textStr = textStr.slice(3);
+                else if (textStr.startsWith('91') && textStr.length === 12) textStr = textStr.slice(2);
+                return textStr;
+            });
+
+            const uniqueDataSet = Array.from(new Set(strippedArr));
+            
+            const outputBox = document.getElementById('whatsappCleanedOutput');
+            const outputContainer = document.getElementById('cleanOutputContainer');
+            const countLabel = document.getElementById('extractedTotalCount');
+
+            if (uniqueDataSet.length > 0) {
+                outputBox.innerText = uniqueDataSet.join(', ');
+                countLabel.innerText = `Total Clean Count: ${uniqueDataSet.length}`;
+                outputContainer.style.display = 'block';
+            } else {
+                alert("Data Processing Notice: Core system could not isolate valid phone numbers from the injected logs.");
+                outputContainer.style.display = 'none';
             }
         }
     </script>
